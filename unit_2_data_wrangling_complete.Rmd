@@ -113,6 +113,8 @@ library(tidyverse)
 
 rbi <- read_csv("Flashy_Dat_Subset.csv")
 
+test_df <- read.csv("Flashy_Dat_Subset.csv")
+
 ```
 
 ## Wait, hold up. What is a tibble?
@@ -121,6 +123,7 @@ Good question. It's a fancy way to store data that works well with tidyverse fun
 
 ```{r echo=TRUE}
 head(rbi)
+head(test_df)
 ```
 
 Now read in the same data with read.csv() which will NOT read the data as a tibble. How is it different? Output each one in the Console.
@@ -186,6 +189,7 @@ Sort the rbi data by the RBI column in ascending and then descending order
 
 ```{r echo=TRUE}
 arrange(rbi, RBI)
+
 
 arrange(rbi, desc(RBI))
 
