@@ -1,0 +1,348 @@
+```{r}
+
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, results = FALSE)
+
+```
+
+# Data wrangling using tidyverse
+
+Follow this [link](https://github.com/tpcovino/unit_2_data_wrangling){target="_blank"} to download everything you need for this unit. When you get to GitHub click on "Code" (green button) and select "download zip". You will then save this to a local folder where you should do all of your work for this class. You will work through the "\_blank.Rmd". Always be sure to read the README.md files in the GitHub repo.
+
+Once you have this folder saved where you would like it, open RStudio and navigate to the folder. Next, open the project (".Rproj"). Doing so will set the folder as the working directory, make your life easier, and make everything generally work.
+
+## Introduction
+
+We have messed around with plotting a bit and you've seen a little of what R can do. So now let's review or introduce you to some basics. Even if you have worked in R before, it is good to be remind of/practice with this stuff, so stay tuned in!
+
+Reading for this week:
+
+[Chapter 2.1: Graphical analysis of single datasets](https://pubs.usgs.gov/tm/04/a03/tm4a3.pdf){target="_blank"} in SMWR
+
+[Workflow: basics](https://r4ds.had.co.nz/workflow-basics.html){target="_blank"}
+
+[Data transformation](https://r4ds.had.co.nz/transform.html){target="_blank"}
+
+## Learning objectives:
+
+Working through this exercise will help students:\
+- become more familiar with the RStudio IDE\
+- get in the habit of running single lines of code\
+- know what a tibble is\
+- know what the assignment operator is\
+- begin using base and dplyr functions
+
+## You can use R as a calculator
+
+If you just type numbers and operators in, R will spit out the results.
+
+It is generally good to run one line of code at a time. In mac you do that by putting your cursor on the line and hitting command + enter. On windows/PC that is ctrl + enter.
+
+[Here is a link to info on Editing and Executing code in RStudio](https://support.posit.co/hc/en-us/articles/200484448-Editing-and-Executing-Code-in-the-RStudio-IDE){target="_blank"}
+
+[Very handy link to all keyboard shortcuts Windows, Linux and Mac](https://support.posit.co/hc/en-us/articles/200711853-Keyboard-Shortcuts){target="_blank"}
+
+```{r}
+1 + 2
+
+2 + 2
+```
+
+## You can create new objects using \<-
+
+Yes, = does the same thing. But use \<-. We will call \<- assignment or assignment operator. When we are coding in R we use \<- to assign values to objects and = to set values for parameters in functions/equations/etc. Using \<- helps us differentiate between the two. Norms for formatting are important because they help us understand what code is doing, especially when stuff gets complex.
+
+Oh, one more thing: Surround operators with spaces.
+
+x \<- 1 is easier to read than x\<-1
+
+You can assign single numbers or entire chunks of data using \<-
+
+So if you had an object called my_data and wanted to copy it into my_new_data you could do:
+
+my_new_data \<- my_data
+
+You can then recall/print the values in an object by just typing the name by itself.
+
+In the code chunk below, assign a 3 to the object "y" and then print it out.
+
+```{r}
+# This is a code chunk. 
+# Putting a pound sign in here allows me to type text that is not code.
+# The stuff below is code. Not text. 
+
+y <- 3
+y
+
+```
+
+If you want to assign multiple values, you have to put them in the function c() c means combine. R doesn't know what to do if you just give it a bunch of values with space or commas, but if you put them as arguments in the combine function, it'll make them into a vector.
+
+Any time you need to use several values, even passing as an argument to a function, you have to put them in c() or it won't work.
+
+```{r}
+a <- c(1,2,3,4)
+a
+```
+
+When you are creating objects, try to give them meaningful names so you can remember what they are. You can't have spaces or operators that mean something else as part of a name. And remember, everything is case sensitive.
+
+Assign the value 5.4 to water_pH and then try to recall it by typing "water_ph"
+
+```{r}
+water_pH <- 5.4
+
+water_pH
+
+```
+
+If we want to remove something from the environment we can use rm(). Try to remove water_pH.
+
+You can also set objects equal to strings, or values that have letters in them. To do this you just have to put the value in quotes, otherwise R will think it is an object name and tell you it doesn't exist.
+
+Try: name \<- "your name" and then name \<- your name
+
+What happens if you forget the ending parenthesis?
+
+R can be cryptic with it's error messages or other responses, but once you get used to them, you know exactly what is wrong when they pop up.
+
+As a note - when you go to the internet for example code it will often say things like df \<- your_data, this is similar to what I've written above: name \<- "your name". It means enter you name (or your data). As you progress you will get better at understanding example code and understanding error messages.
+
+```{r}
+name <- "Tim"
+#name <- Tim
+```
+
+## Using functions
+
+As an example, let's try the seq() function, which creates a sequence of numbers.
+
+```{r}
+seq(from = 1, to = 10, by = 1) # these are base R functions
+
+#or
+
+seq(1, 10, 1)
+
+#or
+
+seq(1, 10)
+
+#what does this do
+seq(10,1)
+```
+
+## Read in some data
+
+First we will load the tidyverse library, everything we have done so far today is in base R. Next, let's load a few dataframes and have a look at them. We will load the "PINE_NFDR_Jan-Mar_2010.csv" and "flashy_dat_all.csv" files.
+
+Important: read_csv() is the tidyverse csv reading function, the base R function is read.csv(). read.csv() will not read your data in as a tibble, which is the format used by tidyverse functions. You should get in the habit of using the tidyverse versions such as read_csv().
+
+```{r}
+library(tidyverse)
+
+flow <- read_csv("pine_nfdr_jan-mar_2010.csv")
+rbi <- read_csv("flashy_dat_all.csv")
+
+
+```
+
+## What is a tibble?
+
+Good question. It's a fancy way to store data that works well with tidyverse functions. Let's look at the flow tibble with "head" and "str"
+
+```{r}
+head(flow)
+str(flow)
+```
+
+Now read in the same data with read.csv() which will NOT read the data as a tibble. How is it different? Output each one in the Console.
+
+Knowing the data type for each column is super helpful for a few reasons.... let's talk about them.
+
+```{r}
+
+flow_NT <- read.csv("pine_nfdr_jan-mar_2010.csv") # this is base R
+
+head(flow_NT)
+head(flow)
+
+# We can remove the flow_NT dataframe from the enviroment with rm(flow_NT)
+rm(flow_NT)
+
+```
+
+## Data wrangling in dplyr
+
+If you forget syntax or what the following functions do, here is an excellent cheat sheet: <https://rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf>
+
+We will demo five functions below (these are tidyverse/dplyr functions):
+
+-   **filter()** - returns rows that meet specified conditions
+-   **arrange()** - reorders rows
+-   **select()** - pull out variables (columns)
+-   **mutate()** - create new variables (columns) or reformat existing ones
+-   **summarize()** - collapse groups of values into summary stats
+
+## Filter
+
+Write an expression that returns data in rbi for the state of Montana (MT)
+
+```{r}
+
+filter(rbi, STATE == "MT")
+
+```
+
+And one that keeps flows less than 100 cfs in the "flow" dataframe.
+
+```{r}
+filter(flow, cfs < 100)
+```
+
+Above we just executed the operation, but didn't save it. Let's save that work using the assignment operator.
+
+```{r}
+rbi_mt <- filter(rbi, STATE == "MT")
+
+low_flows <- filter(flow, cfs < 100)
+```
+
+### Multiple conditions
+
+How many gages are there in Montana with an rbi greater than 0.05
+
+```{r}
+
+filter(rbi, STATE == "MT" & RBI > 0.05)
+
+```
+
+Challenge: Filter for flow less than 100 cfs just for the NFDR gauge in "flow".
+
+## Arrange
+
+Arrange sorts by a column in your dataset.
+
+Sort the rbi data by the RBI column in ascending and then descending order
+
+```{r}
+arrange(rbi, RBI)
+
+
+arrange(rbi, desc(RBI))
+
+```
+
+## Select
+
+Look at the RBI dataframe. There are too many columns! You will often want to get rid of some columns and clean up the dataframe (df) for analysis.
+
+Select Site name, state, and RBI from the rbi data
+
+Note they come back in the order you put them in in the function, not the order they were in in the original data.
+
+You can do a lot more with select, especially when you need to select a bunch of columns but don't want to type them all out. For example, if you want to select a group of columns you can specify the first and last with a colon in between (first:last) and it'll return all of them. Select the rbi columns from site_no to DRAIN_SQKM. You can also remove one column with select(-column). Remove the "surrogate" column from flow.
+
+```{r}
+
+rbi_mt_thin <- select(rbi, STANAME, STATE, RBI)
+
+rbi_thin <- select(rbi, site_no:DRAIN_SQKM)
+
+flow_thin <- select(flow, -surrogate)
+
+```
+
+## Mutate
+
+Use mutate to add new columns based on additional ones. Common uses are to create a column of data in different units, or to calculate something based on two columns. You can also use it to just update a column, by naming the new column the same as the original one (but be careful because you'll lose the original one!).
+
+Create a new column in rbi called T_RANGE by subtracting T_MIN_SITE from T_MAX_SITE
+
+```{r}
+mutate(rbi, T_RANGE = T_MAX_SITE - T_MIN_SITE)
+
+```
+
+When downloading data from the USGS through R, you have to enter the gage ID as a character, even though they are all made up of numbers. So to practice doing this, update the site_no column to be a character datatype
+
+```{r}
+mutate(rbi, site_no = as.character(site_no))
+
+```
+
+## Summarize
+
+Summarize will perform an operation on all of your data, or groups if you assign groups.
+
+Use summarize to compute the mean, min, and max rbi
+
+```{r}
+rbi_sum <- summarize(rbi, meanrbi = mean(RBI), maxrbi = max(RBI), minrbi = min(RBI))
+```
+
+Now use the group function to group rbi by state and then summarize in the same way as above, but for the full r
+
+```{r}
+rbi_state <- group_by(rbi, STATE)
+
+rbi_state <- summarize(rbi_state, meanrbi = mean(RBI), maxrbi = max(RBI), minrbi = min(RBI))
+```
+
+## Multiple operations with pipes
+
+You will note that your environment is filling up with objects. We can eliminate many of those by using pipes.
+
+The pipe operator %\>% allows you to perform multiple operations in a sequence without saving intermediate steps. Not only is this more efficient, but structuring operations with pipes is also more intuitive than nesting functions within functions (the other way you can do multiple operations).
+
+When you use the pipe, it basically takes whatever came out of the first function and puts it into the data argument for the next one, so:
+
+rbi %\>% group_by(STATE)
+
+**is the same as**
+
+group_by(rbi, STATE)
+
+Take the groupby and summarize code from above and perform the operation using the pipe
+
+```{r}
+
+rbi_sum <- rbi %>%
+  group_by(STATE) %>%
+  summarize(meanrbi = mean(RBI), maxrbi = max(RBI), minrbi = min(RBI))
+
+```
+
+## A final comment on NAs
+
+We will talk more about this when we discuss stats, but some operations will fail if there are NA's in the data. If appropriate, you can tell functions like mean() to ignore NAs by using na.rm = TRUE. You can also use drop_na() if you're working with a tibble. But be aware if you use that and save the result, drop_na() gets rid of the whole row, not just the NA. Because what would you replace it with.... an NA?
+
+First, lets create a small data frame called x that includes: 1, 2, 3, 4, NA. How do we do that?
+
+```{r}
+
+x <- c(1,2,3,4,NA)
+
+```
+
+Next, lets take the mean of x.
+
+```{r}
+
+mean(x)
+
+```
+
+How do you think we can fix this problem?
+
+```{r}
+mean(x, na.rm = TRUE)
+```
+
+## That's it for today
+
+Can you run all of the code in this unit? Do you get errors? If you are working on a lab computer have you gotten your folder management set up?
+
+## Exit ticket
+
+If you have an error or problem we need to manage - let me know. If not write NA!
